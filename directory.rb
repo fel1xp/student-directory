@@ -5,7 +5,7 @@ def input_students
   puts 'To finish, just hit return twice'
   # get the first name
   puts 'Enter the Villain'
-  name = gets.chomp
+  name = STDIN.gets.chomp
   # while the name if not empty, repeat this code
   until name.empty?
     # add the student hash to the array
@@ -18,7 +18,7 @@ def input_students
     end
     # get another name from the user
     puts 'Enter the Villain'
-    name = gets.chomp
+    name = STDIN.gets.chomp
   end
 end
 
@@ -75,30 +75,42 @@ end
 def interactive_menu
   loop do
     print_menu
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
-def save_students 
-  #open the file for writing
-  file = File.open("students.csv", "w")
-  #iterate over the array of students
+def save_students
+  # open the file for writing
+  file = File.open('students.csv', 'w')
+  # iterate over the array of students
   @students.each do |student|
     student_data = [student[:name], student[:cohort]]
-    csv_line = student_data.join(",")
+    csv_line = student_data.join(',')
     file.puts csv_line
   end
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
+def load_students(_filename = 'students.csv')
+  file = File.open('students.csv', 'r')
   file.readlines.each do |line|
-  name, cohort = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym}
+    name, cohort = line.chomp.split(',')
+    @students << { name: name, cohort: cohort.to_sym }
   end
   file.close
 end
 
+def try_load_students
+  filename = ARGV.first# first argument from the command line
+  return if filename.nil? # get out of the method if it isn't given
+  if File.exists?(filename) # if it exists
+    load_students(filename)
+     puts "Loaded #{@students.count} from #{filename}"
+  else # if it doesn't exist
+    puts "Sorry, #{filename} doesn't exist."
+    exit # quit the program
+  end
+end
 
+try_load_students
 interactive_menu
